@@ -1,6 +1,7 @@
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { createClient } from "contentful";
 import Image from "next/image";
+import Skeleton from "../../components/Skeleton";
 
 const client = createClient({
   space: process.env.CONTENTFUL_SPACE_ID,
@@ -8,7 +9,8 @@ const client = createClient({
 });
 
 export default function RecipeDetails({ recipe }) {
-  // console.log(recipe);
+  if (!recipe) return <Skeleton />;
+
   const {
     featuerdImage,
     title,
@@ -75,7 +77,6 @@ export const getStaticProps = async ({ params }) => {
     content_type: "recipe",
     "fields.slug": params.slug,
   });
-  // console.log(items);
 
   return {
     props: {
@@ -89,17 +90,15 @@ export const getStaticPaths = async () => {
   const res = await client.getEntries({
     content_type: "recipe",
   });
-  // console.log(res.items);
 
   const paths = res.items.map((item) => {
     return {
       params: { slug: item.fields.slug },
     };
   });
-  // console.log(paths);
 
   return {
     paths,
-    fallback: false,
+    fallback: true,
   };
 };
